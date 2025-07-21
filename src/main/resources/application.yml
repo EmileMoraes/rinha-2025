@@ -1,0 +1,24 @@
+server:
+  port: 8686
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/rb2025
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+  data:
+    redis:
+      host: ${BROKER_HOST:localhost}
+      port: 6379
+
+processor:
+  default:
+    url: ${PAYMENT_PROCESSOR_URL_DEFAULT}
+  fallback:
+    url: ${PAYMENT_PROCESSOR_URL_FALLBACK}
