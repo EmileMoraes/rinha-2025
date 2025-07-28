@@ -1,10 +1,12 @@
-package com.rinha.payment_gateway.service;
+package com.rinha.payment_gateway.client;
 
 import com.rinha.payment_gateway.dto.PaymentRequest;
 import com.rinha.payment_gateway.model.PaymentProcessorStatus;
 import com.rinha.payment_gateway.repository.Payment;
 import com.rinha.payment_gateway.repository.PaymentRepository;
 import com.rinha.payment_gateway.util.ServiceHealthManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ public class PaymentProcessingService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final RedisTemplate<String, PaymentRequest> redisTemplate;
     private final PaymentRepository paymentRepository;
+
+    Logger logger = LoggerFactory.getLogger(PaymentProcessingService.class);
 
     private final String defaultProcessUrl;
     private final String fallbackProcessUrl;
@@ -36,13 +40,13 @@ public class PaymentProcessingService {
     }
 
     public void processQueue(){
-        System.out.println("Scheduler is running...");
+        logger.info("Scheduler is running...");
 
         PaymentProcessorStatus defaultStatus = serviceHealthManager.getStatus("default");
         PaymentProcessorStatus fallbackStatus = serviceHealthManager.getStatus("fallback");
 
         if (defaultStatus == PaymentProcessorStatus.DOWN && fallbackStatus == PaymentProcessorStatus.DOWN) {
-            System.out.println("Services is DOWN");
+            logger.info("Default and Fallback are DOWN");
             return;
         }
 
@@ -73,7 +77,7 @@ public class PaymentProcessingService {
                 saveSuccessfulPayment(payment, processedBy);
             } else {
                 redisTemplate.opsForList().rightPush(paymentQueueKey, payment);
-                System.err.println("Error processing payment in both services " + payment.correlationId());
+                logger.error("Error processing payment in both services {}", payment.correlationId());
                 break;
             }
         }
@@ -82,16 +86,16 @@ public class PaymentProcessingService {
     private boolean attemptToProcess(PaymentRequest paymentRequest, String processUrl) {
         try {
             restTemplate.postForEntity(processUrl, paymentRequest, String.class);
-            System.out.println("Send message successfully " + paymentRequest);
+            logger.info("Successfully sending payment request {}", paymentRequest);
             return true;
         }  catch (Exception e) {
-            System.out.println("Error processing request to external API: " + e.getMessage());
+            logger.error("Error processing request to external API: {}", e.getMessage());
             return false;
         }
     }
 
     private void saveSuccessfulPayment(PaymentRequest paymentRequest, String processedBy) {
-        System.out.println("Saving payment to database: " + paymentRequest.correlationId());
+        logger.info("Saving payment to database: {}", paymentRequest.correlationId());
 
         Payment payment = new Payment(
         paymentRequest.correlationId(),
