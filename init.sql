@@ -1,8 +1,6 @@
-CREATE UNLOGGED TABLE payments(
-  correlation_id UUID PRIMARY KEY,
-  amount NUMERIC(38, 2) NOT NULL,
-  requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  processor INTEGER DEFAULT 0
+CREATE TABLE IF NOT EXISTS payments (
+    correlation_id VARCHAR(255) PRIMARY KEY,
+    amount NUMERIC(10, 2) NOT NULL,
+    processed_by VARCHAR(20),
+    processed_at TIMESTAMP
 );
-
-CREATE INDEX payments_requested_at ON payments (requested_at);
