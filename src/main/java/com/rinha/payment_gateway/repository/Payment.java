@@ -1,4 +1,4 @@
-package com.rinha.payment_gateway;
+package com.rinha.payment_gateway.repository;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.Instant;
 
 @Entity
 @Table(name = "payments")
@@ -18,11 +20,14 @@ import java.io.Serializable;
 public class Payment implements Serializable {
 
     @Id
-    private String correlation_id;
+    private String correlationId;
 
     @Column
-    private double amount;
+    private BigDecimal amount;
 
     @Column
-    private String processed_by;
+    private String processedBy;
+
+    @Column
+    private Instant processedAt;
 }

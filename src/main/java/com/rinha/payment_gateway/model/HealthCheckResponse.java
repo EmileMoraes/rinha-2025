@@ -1,4 +1,4 @@
-package com.rinha.payment_gateway.dto;
+package com.rinha.payment_gateway.model;
 
 import lombok.Getter;
 import lombok.Setter;
