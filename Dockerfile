@@ -6,8 +6,10 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-RUN mvn clean package -DskipTests
+#RUN mvn clean package -DskipTests
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+RUN mvn clean package -DskipTests -Dmaven.javadoc.skip=true -Dmaven.source.skip=true
+
 
 # --- Stage 2: Create the final runtime image ---
 FROM eclipse-temurin:17-jre
