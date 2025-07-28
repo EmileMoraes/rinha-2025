@@ -2,23 +2,36 @@ server:
   port: 8686
 
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:5432/rb2025
+    url: jdbc:postgresql://${DB_HOST:postgres}:5432/rb2025
     username: postgres
     password: postgres
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
       dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
+  main:
+    lazy-initialization: true
 
   data:
     redis:
-      host: ${BROKER_HOST:localhost}
+      host: ${BROKER_HOST:redis}
       port: 6379
 
-processor:
-  default:
-    url: ${PAYMENT_PROCESSOR_URL_DEFAULT}
-  fallback:
-    url: ${PAYMENT_PROCESSOR_URL_FALLBACK}
+payment:
+  processor:
+    default-url: http://payment-processor-default:8080
+    fallback-url: http://payment-processor-fallback:8080
+  queue:
+    name: payment_queue
+
+logging:
+  level:
+    root: WARN
+    org.hibernate.SQL: ERROR
+    org.springframework: WARN

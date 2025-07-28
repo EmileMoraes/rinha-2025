@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    lazy-initialization: true
+  jpa:
+    open-in-view: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/rb2025
+    username: postgres
+    password: postgres
+  data:
+    redis:
+      host: localhost
+      port: 6379
+payment:
+  processor:
+    default-url: http://localhost:8001
+    fallback-url: http://localhost:8002
+
+logging:
+  level:
+    root: WARN
+    org.hibernate.SQL: ERROR
+    org.springframework: WARN
